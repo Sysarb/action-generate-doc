@@ -1,0 +1,60 @@
+name: 'Generate documentation'
+description: 'Generate micro service documentation'
+inputs:
+  name:
+    description: 'Name of the micro service'
+    required: true
+
+  token:
+    description: 'GitHub token'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout release-tools
+      uses: actions/checkout@master
+      with:
+        repository: Sysarb/release-tools
+        token: ${{ inputs.token }}
+        path: ./release-tools
+
+    - name: Install release-tools
+      shell: bash
+      run: npm --prefix ./release-tools ci --production
+
+    - name: Install typedoc
+      shell: bash
+      run: npm install typedoc typedoc-plugin-markdown typedoc-github-wiki-theme --save-dev
+
+    - name: Generate API documentation
+      shell: bash
+      run: |
+        node ./release-tools/api-doc.js > ./DOCS.md
+      env:
+        WIKIPATH: ${{ inputs.name }}
+
+    - name: Generate interface documentation
+      shell: bash
+      run: npx typedoc --theme github-wiki
+
+    - name: Generate REST documentation
+      shell: bash
+      run: |
+        node ./release-tools/rest-doc.js > ./doc/Rest-API.md
+      env:
+        WIKIPATH: ${{ inputs.name }}
+
+    - name: Generate configuration documentation
+      shell: bash
+      run: |
+        node ./release-tools/config-doc.js > ./doc/Configuration.md
+      env:
+        WIKIPATH: ${{ inputs.name }}
+
+    - name: Upload documentation to Wiki
+      uses: SwiftDocOrg/github-wiki-publish-action@v1
+      with:
+        path: "doc"
+      env:
+        GH_PERSONAL_ACCESS_TOKEN: ${{ inputs.token }}
