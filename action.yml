@@ -12,7 +12,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v2
+    - name: Install node
+      uses: actions/setup-node@v2
       with:
         node-version: '16'
 
@@ -40,10 +41,6 @@ runs:
       env:
         WIKIPATH: ${{ inputs.name }}
 
-    - name: Generate interface documentation
-      shell: bash
-      run: npx typedoc --theme github-wiki
-
     - name: Generate REST documentation
       shell: bash
       run: |
@@ -51,12 +48,9 @@ runs:
       env:
         WIKIPATH: ${{ inputs.name }}
 
-    - name: Generate configuration documentation
+    - name: Generate interface documentation
       shell: bash
-      run: |
-        node ./release-tools/config-doc.js > ./doc/Configuration.md
-      env:
-        WIKIPATH: ${{ inputs.name }}
+      run: npx typedoc --theme github-wiki
 
     - name: Upload documentation to Wiki
       uses: SwiftDocOrg/github-wiki-publish-action@v1
