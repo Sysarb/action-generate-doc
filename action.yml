@@ -33,6 +33,7 @@ runs:
     - name: Generate REST documentation
       shell: bash
       run: |
+        mkdir -p ./doc
         node ${{ github.action_path }}/rest-doc.js > ./doc/Rest-API.md
       env:
         WIKIPATH: ${{ inputs.name }}
