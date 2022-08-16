@@ -17,17 +17,6 @@ runs:
       with:
         node-version: '16'
 
-    - name: Checkout release-tools
-      uses: actions/checkout@master
-      with:
-        repository: Sysarb/release-tools
-        token: ${{ inputs.token }}
-        path: ./release-tools
-
-    - name: Install release-tools
-      shell: bash
-      run: npm --prefix ./release-tools ci --production
-
     - name: Install typedoc
       shell: bash
       run: npm install typedoc typedoc-plugin-markdown typedoc-github-wiki-theme --save-dev
@@ -37,14 +26,14 @@ runs:
     - name: Generate API documentation
       shell: bash
       run: |
-        node ./release-tools/api-doc.js > ./DOCS.md
+        node ${{ github.action_path }}/api-doc.js > ./DOCS.md
       env:
         WIKIPATH: ${{ inputs.name }}
 
     - name: Generate REST documentation
       shell: bash
       run: |
-        node ./release-tools/rest-doc.js > ./doc/Rest-API.md
+        node ${{ github.action_path }}/rest-doc.js > ./doc/Rest-API.md
       env:
         WIKIPATH: ${{ inputs.name }}
 
